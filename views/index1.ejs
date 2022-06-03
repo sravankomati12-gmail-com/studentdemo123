@@ -184,6 +184,7 @@
         </div>
       </div>
     </div>
+
     <!-- edit -->
 
     <!-- Modal -->
@@ -235,7 +236,34 @@
       </div>
     </div>
     <!-- edit -->
+
     <script>
+      //  get all students
+      function getStudents() {
+        fetch("http://localhost:4001/api/student/getall")
+          .then((res) => res.json())
+          .then((data) => {
+            var count = 1;
+            var printdata = ``;
+            for (var data of data.data) {
+              printdata += `<tr><td>${count}</td><td>${data.name}</td><td>${
+                data.email
+              }</td><td>${data.age}</td><td>${data.gender}</td><td>${
+                data.hobbies
+              }</td><td>${data.dob.split("T")[0]}</td>
+                <td><button class='btn btn-warning' id="${
+                  data._id
+                }" data-toggle="modal"  data-target="#exampleModal1" onclick='getStudent(this.id)'>Edit</button></td>
+                <td><a class='btn btn-danger' id="${
+                  data._id
+                }" onclick="deletestudent(this.id)">Delete</a></td></tr>`;
+              count += 1;
+            }
+            document.getElementById("setdata").innerHTML = printdata;
+          });
+      }
+
+      // add student
       function savedata() {
         var checkboxs = document.getElementsByClassName("checks");
         var hobbies = [];
@@ -288,67 +316,34 @@
           return false;
         } else {
           var data = { name, email, age, gender, dob, hobbies };
-          $.ajax({
-            type: "POST",
-            url: "http://localhost:4001/api/student/add",
-            data: data,
-            dataType: "json",
-            success: () => {
-              window.location.reload();
-            },
-          });
+
+          fetch("http://localhost:4001/api/student/add", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { "Content-type": "application/json; charset=UTF-8 " },
+          }).then(window.location.reload());
           return true;
         }
       }
-      function getStudents() {
-        $.ajax({
-          type: "GET",
-          url: "http://localhost:4001/api/student/getall",
-
-          success: (res) => {
-            var count = 1;
-            var printdata = ``;
-            for (var data of res.data) {
-              printdata += `<tr><td>${count}</td><td>${data.name}</td><td>${
-                data.email
-              }</td><td>${data.age}</td><td>${data.gender}</td><td>${
-                data.hobbies
-              }</td><td>${data.dob.split("T")[0]}</td>
-                <td><button class='btn btn-warning' id="${
-                  data._id
-                }" data-toggle="modal"  data-target="#exampleModal1" onclick='getStudent(this.id)'>Edit</button></td>
-                <td><a class='btn btn-danger' id="${
-                  data._id
-                }" onclick="deletestudent(this.id)">Delete</a></td></tr>`;
-              count += 1;
-            }
-            document.getElementById("setdata").innerHTML = printdata;
-          },
-        });
-      }
+      // delete student
       function deletestudent(id) {
-        $.ajax({
-          type: "DELETE",
-          url: "http://localhost:4001/api/student/delete?id=" + id,
-          //   data: data,
-          //   dataType: "json",
-          success: (res) => {
-            window.location.reload();
-          },
-        });
+        if (confirm("are sure want be delete this student")) {
+          fetch("http://localhost:4001/api/student/delete?id=" + id, {
+            method: "DELETE",
+          }).then(window.location.reload());
+        }
       }
+      //  get student by id
+
       function getStudent(id) {
-        $.ajax({
-          type: "Get",
-          url: "http://localhost:4001/api/student/getbyid?id=" + id,
-          //   data: data,
-          //   dataType: "json",
-          success: (res) => {
-            editform(res);
-          },
-        });
+        fetch("http://localhost:4001/api/student/getbyid?id=" + id)
+          .then((res) => res.json())
+          .then((data) => {
+            editform(data.data);
+          });
       }
-      function editform(res) {
+      //  data bind to form
+      function editform(data) {
         var getform = "";
         var genderm = "",
           genderf = "",
@@ -356,35 +351,35 @@
           hobbiesw = "",
           hobbiess = "",
           hobbiest = "";
-        if (res.data.gender === "male") {
+        if (data.gender === "male") {
           genderm = "checked";
         } else {
           genderf = "checked";
         }
-        for (let index = 0; index < res.data.hobbies.length; index++) {
-          console.log(res.data.hobbies[index]);
-          if (res.data.hobbies[index] == "Reading") {
+        for (let index = 0; index < data.hobbies.length; index++) {
+          console.log(data.hobbies[index]);
+          if (data.hobbies[index] == "Reading") {
             hobbiesr = "checked";
           }
-          if (res.data.hobbies[index] == "Writting") {
+          if (data.hobbies[index] == "Writting") {
             hobbiesw = "checked";
           }
-          if (res.data.hobbies[index] == "Singing") {
+          if (data.hobbies[index] == "Singing") {
             hobbiess = "checked";
           }
-          if (res.data.hobbies[index] == "Travelling") {
+          if (data.hobbies[index] == "Travelling") {
             hobbiest = "checked";
           }
         }
         getform += `<div class="form-group">
-              <input type="hidden" id="_id" value="${res.data._id}"
+              <input type="hidden" id="_id" value="${data._id}"
                   <label>Name</label>
                   <input
                     type="text"
                     class="form-control"
                     placeholder="Enter name"
                     id="name1"
-                    value="${res.data.name}"
+                    value="${data.name}"
                     required
                   />
                   <div id="name1v" style="color: red"></div>
@@ -396,7 +391,7 @@
                     class="form-control"
                     placeholder="Enter email"
                     id="email1"
-                    value="${res.data.email}"
+                    value="${data.email}"
                     required
                   />
                   <div id="email1v" style="color: red"></div>
@@ -408,7 +403,7 @@
                     class="form-control"
                     placeholder="Enter age"
                     id="age1"
-                    value="${res.data.age}"
+                    value="${data.age}"
                     required
                   />
                   <div id="age1v" style="color: red"></div>
@@ -420,7 +415,7 @@
                     class="form-control"
                     placeholder="Enter date"
                     id="dob1"
-                    value="${res.data.dob.split("T")[0]}"
+                    value="${data.dob.split("T")[0]}"
                     required
 
                   />
@@ -447,6 +442,7 @@
                 </div>`;
         document.getElementById("geteditform").innerHTML = getform;
       }
+      // update student
       function saveeditdata() {
         var checkboxs = document.getElementsByClassName("checks1");
         var hobbies = [];
@@ -501,15 +497,11 @@
           return false;
         } else {
           var data = { name, email, age, gender, dob, hobbies };
-          $.ajax({
-            type: "POST",
-            url: "http://localhost:4001/api/student/update?id=" + id,
-            data: data,
-            dataType: "json",
-            success: () => {
-              window.location.reload();
-            },
-          });
+          fetch("http://localhost:4001/api/student/update?id=" + id, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { "Content-type": "application/json; charset=UTF-8 " },
+          }).then(window.location.reload());
         }
       }
     </script>
