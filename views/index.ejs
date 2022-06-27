@@ -290,7 +290,7 @@
           var data = { name, email, age, gender, dob, hobbies };
           $.ajax({
             type: "POST",
-            url: "http://localhost:4001/api/student/add",
+            url: "<% url%>api/student/add",
             data: data,
             dataType: "json",
             success: () => {
@@ -303,7 +303,7 @@
       function getStudents() {
         $.ajax({
           type: "GET",
-          url: "http://localhost:4001/api/student/getall",
+          url: "<% url%>api/student/getall",
 
           success: (res) => {
             var count = 1;
@@ -329,7 +329,7 @@
       function deletestudent(id) {
         $.ajax({
           type: "DELETE",
-          url: "http://localhost:4001/api/student/delete?id=" + id,
+          url: "<% url%>api/student/delete?id=" + id,
           //   data: data,
           //   dataType: "json",
           success: (res) => {
@@ -340,7 +340,7 @@
       function getStudent(id) {
         $.ajax({
           type: "Get",
-          url: "http://localhost:4001/api/student/getbyid?id=" + id,
+          url: "<% url%>api/student/getbyid?id=" + id,
           //   data: data,
           //   dataType: "json",
           success: (res) => {
@@ -503,7 +503,7 @@
           var data = { name, email, age, gender, dob, hobbies };
           $.ajax({
             type: "POST",
-            url: "http://localhost:4001/api/student/update?id=" + id,
+            url: "<% url%>api/student/update?id=" + id,
             data: data,
             dataType: "json",
             success: () => {
